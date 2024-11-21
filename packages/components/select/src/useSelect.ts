@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   computed,
   nextTick,
@@ -48,23 +47,30 @@ import {
   useFormSize,
 } from '@element-plus/components/form'
 
-import type ElTooltip from '@element-plus/components/tooltip'
-import type { ISelectProps, SelectOptionProxy } from './token'
+import type { TooltipInstance } from '@element-plus/components/tooltip'
+import type {
+  OptionInternalInstance,
+  OptionProps,
+  OptionPublicInstance,
+  SelectEmitFn,
+  SelectProps,
+  SelectStates,
+} from './type'
 
 const MINIMUM_INPUT_WIDTH = 11
 
-export const useSelect = (props: ISelectProps, emit) => {
+export const useSelect = (props: SelectProps, emit: SelectEmitFn) => {
   const { t } = useLocale()
   const contentId = useId()
   const nsSelect = useNamespace('select')
   const nsInput = useNamespace('input')
 
-  const states = reactive({
+  const states: SelectStates = reactive({
     inputValue: '',
     options: new Map(),
     cachedOptions: new Map(),
-    optionValues: [] as any[], // sorted value of options
-    selected: [] as any[],
+    optionValues: [], // sorted value of options
+    selected: [],
     selectionWidth: 0,
     calculatorWidth: 0,
     collapseItemWidth: 0,
@@ -77,20 +83,20 @@ export const useSelect = (props: ISelectProps, emit) => {
   })
 
   // template refs
-  const selectRef = ref<HTMLElement>(null)
-  const selectionRef = ref<HTMLElement>(null)
-  const tooltipRef = ref<InstanceType<typeof ElTooltip> | null>(null)
-  const tagTooltipRef = ref<InstanceType<typeof ElTooltip> | null>(null)
-  const inputRef = ref<HTMLInputElement | null>(null)
-  const calculatorRef = ref<HTMLElement>(null)
-  const prefixRef = ref<HTMLElement>(null)
-  const suffixRef = ref<HTMLElement>(null)
-  const menuRef = ref<HTMLElement>(null)
-  const tagMenuRef = ref<HTMLElement>(null)
-  const collapseItemRef = ref<HTMLElement>(null)
+  const selectRef = ref<HTMLElement>()
+  const selectionRef = ref<HTMLElement>()
+  const tooltipRef = ref<TooltipInstance>()
+  const tagTooltipRef = ref<TooltipInstance>()
+  const inputRef = ref<HTMLInputElement>()
+  const calculatorRef = ref<HTMLElement>()
+  const prefixRef = ref<HTMLElement>()
+  const suffixRef = ref<HTMLElement>()
+  const menuRef = ref<HTMLElement>()
+  const tagMenuRef = ref<HTMLElement>()
+  const collapseItemRef = ref<HTMLElement>()
   const scrollbarRef = ref<{
     handleScroll: () => void
-  } | null>(null)
+  }>()
 
   const {
     isComposing,
@@ -162,7 +168,7 @@ export const useSelect = (props: ISelectProps, emit) => {
 
   const validateState = computed(() => formItem?.validateState || '')
   const validateIcon = computed(
-    () => ValidateComponentsMap[validateState.value]
+    () => validateState.value && ValidateComponentsMap[validateState.value]
   )
 
   const debounce = computed(() => (props.remote ? 300 : 0))
@@ -194,7 +200,7 @@ export const useSelect = (props: ISelectProps, emit) => {
 
   const optionsArray = computed(() => {
     const list = Array.from(states.options.values())
-    const newList = []
+    const newList: OptionPublicInstance[] = []
     states.optionValues.forEach((item) => {
       const index = list.findIndex((i) => i.value === item)
       if (index > -1) {
@@ -424,7 +430,7 @@ export const useSelect = (props: ISelectProps, emit) => {
     states.selected = result
   }
 
-  const getOption = (value) => {
+  const getOption = (value: OptionProps['value']) => {
     let option
     const isObjectValue = isPlainObject(value)
 
@@ -462,16 +468,16 @@ export const useSelect = (props: ISelectProps, emit) => {
   }
 
   const resetSelectionWidth = () => {
-    states.selectionWidth = selectionRef.value.getBoundingClientRect().width
+    states.selectionWidth = selectionRef.value!.getBoundingClientRect().width
   }
 
   const resetCalculatorWidth = () => {
-    states.calculatorWidth = calculatorRef.value.getBoundingClientRect().width
+    states.calculatorWidth = calculatorRef.value!.getBoundingClientRect().width
   }
 
   const resetCollapseItemWidth = () => {
     states.collapseItemWidth =
-      collapseItemRef.value.getBoundingClientRect().width
+      collapseItemRef.value!.getBoundingClientRect().width
   }
 
   const updateTooltip = () => {

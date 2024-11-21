@@ -8,13 +8,17 @@ import { buildProps, definePropType, iconPropType } from '@element-plus/utils'
 import { useTooltipContentProps } from '@element-plus/components/tooltip'
 import { ArrowDown, CircleClose } from '@element-plus/icons-vue'
 import { tagProps } from '@element-plus/components/tag'
+import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
+
+import { OptionProps } from './type'
+import type { ExtractPropTypes } from 'vue'
 import type {
   Options,
   Placement,
   PopperEffect,
 } from '@element-plus/components/popper'
 
-export const SelectProps = buildProps({
+export const selectProps = buildProps({
   /**
    * @description the name attribute of select input
    */
@@ -245,3 +249,16 @@ export const SelectProps = buildProps({
   ...useEmptyValuesProps,
   ...useAriaProps(['ariaLabel']),
 })
+/* eslint-disable @typescript-eslint/no-unused-vars */
+export const selectEmits = {
+  [UPDATE_MODEL_EVENT]: (val: SelectProps['modelValue']) => true,
+  [CHANGE_EVENT]: (val: SelectProps['modelValue']) => true,
+  'remove-tag': (val: unknown) => true,
+  'visible-change': (visible: boolean) => true,
+  focus: (evt: FocusEvent) => evt instanceof FocusEvent,
+  blur: (evt: FocusEvent) => evt instanceof FocusEvent,
+  clear: () => true,
+}
+/* eslint-enable @typescript-eslint/no-unused-vars */
+
+export type SelectProps = ExtractPropTypes<typeof selectProps>
